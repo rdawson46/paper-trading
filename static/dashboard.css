@@ -17,8 +17,8 @@ header svg {
     fill: #d53867;
 }
 body {
-    height: 110vh;
-    background-image: url(./background.svg);
+    height: 100vh;
+    background-image: url(./dash-background.svg);
     background-size: cover;
     font-family: sans-serif;
     margin-top: 60px;
@@ -53,39 +53,4 @@ header li {
 header li a {
     color: black;
     text-decoration: none;
-}
-
-.title{
-    font-size: 40px;
-}
-
-.mainGraphic{
-    display: flex;
-    align-items: center;
-    width: 100%;
-    flex-direction: column;
-}
-
-.graph{
-    border-radius: 12px;
-    width: 25%;
-}
-
-.mainGraphic a{
-    color: #d53867;
-}
-
-.mainGraphic ul{
-    list-style-type: none;
-    padding: 0;
-}
-
-.mainGraphic li{
-    margin: 15px 0;
-    padding: 0;
-}
-
-article{
-    font-size: 24px;
-    text-align: center;
 }
