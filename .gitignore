@@ -9,3 +9,7 @@ server.js
 sql
 
 machineLearning
+
+__pycache__
+
+.env
