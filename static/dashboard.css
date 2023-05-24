@@ -54,3 +54,11 @@ header li a {
     color: black;
     text-decoration: none;
 }
+
+.pane{
+    background-color: rgba(255, 255, 255, 0.6); 
+    color: black;
+    border-radius: 12px;
+    margin: 1rem;
+    padding: 0.25rem 0.5rem;
+}

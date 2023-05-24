@@ -13,3 +13,5 @@ machineLearning
 __pycache__
 
 .env
+
+flask_session
