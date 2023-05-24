@@ -80,10 +80,7 @@ def register():
         elif db.execute(text("SELECT * FROM users WHERE email = :email"), {'email':email}).rowcount != 0:
             return render_template('register.html', error="Email already in use")
 
-        # add user to db
-        # sign them to session token
-        # direct them to dashboard with their username
-        # also find a way to use the session token to keep the user logged in and prevent anyone else logging into dash via user id number
+        # creates account and balance and assigns session variable
         db.execute(text('INSERT INTO users (username, email, pass) VALUES (:username, :email, :password)'), {'username': username, 'email':email, 'password': password1})
         db.execute(text('INSERT INTO balances (username, balance) VALUES (:username, :balance)'), {'username': username, 'balance': 0})
         db.commit()
