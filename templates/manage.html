@@ -11,7 +11,7 @@
         <div class="pane">
             <ul class="manageStock">
             {% for stock in stocks %}
-                <li><h2>{{stock}}</h2><button>Buy</button><button>Sell</button></li>
+                <li><h2>{{stock}}</h2><button data-stock="{{stock}}">Buy</button><button data-stock="{{stock}}">Sell</button></li>
             {% endfor %}
             </ul>
         </div>

@@ -14,13 +14,26 @@ class StockAPI:
         if self.key is None:
             raise ValueError
         
-        # self.url = f'https://www.alphavantage.co/query?function=TIME_SERIES_INTRADAY&symbol=IBM&interval=5min&apikey={self.key}'
-        # self.r = requests.get(self.url)
-        # self.data = self.r.json()
+        self.url = 'https://www.alphavantage.co/'
+        # r = requests.get(url)
+        # data = r.json()
     
     def getPrice(self, symbol):
-        pass
+        query = f'query?function=GLOBAL_QUOTE&symbol={symbol}&apikey={self.key}'
+
+        r= requests.get(self.url+query)
+        data = r.json()
+
+        print(data['Global Quote']['05. price'])
+
+    def buyStock(self, symbol, money):
+        # gets the price and then math
+        sharePrice = self.getPrice(symbol)
+
+        shares = money / sharePrice
+
+        return [shares, sharePrice]
 
 
 attempt = StockAPI()
-# print(attempt.data)
+attempt.getPrice('crox')

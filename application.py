@@ -1,4 +1,5 @@
 from functions import validEmail, validPass
+from .SystemAPI.stocks import StockAPI
 
 import os # used for getting enviroment variables set during execution
 import requests # find an api for getting stock prices, use .env file for hiding the api key
@@ -35,6 +36,8 @@ Session(app)
 
 engine = create_engine(os.getenv("DATABASE_URL"))
 db = scoped_session(sessionmaker(bind=engine))
+
+stockAPI = StockAPI()
 
 @app.route("/")
 def index():
@@ -160,21 +163,14 @@ def logout():
 
     return redirect('/')
 
-@app.route('/<string:user>/<string:symbol>')
-def stockDate(symbol):
-    # this function will be called for getting api requests
-    ...
-
-# @app.route()
-def buyStock():
-    ...
-
-# @app.route()
-def sellStock():
-    ...
-
 @app.errorhandler(404)
 def not_found(parm):
     return make_response(render_template('index.html'), 404)
+
+@socketio.on('price')
+def getPrice(data):
+    stock = data['stock']
+
+    emit('priceReturn', {'value': 55})
 
 app.run(debug=True)
