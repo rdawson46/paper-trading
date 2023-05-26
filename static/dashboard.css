@@ -62,3 +62,50 @@ header li a {
     margin: 1rem;
     padding: 0.25rem 0.5rem;
 }
+
+.menu{
+    background-color: white;
+    color: black;
+    border-radius:  12px;
+    margin: 1rem;
+    padding: 0.25rem 0.5rem;
+}
+
+.menu ul{
+    list-style-type: none;
+    padding: 0;
+}
+
+.menu ul li{
+    padding: 0.5rem;
+    transition-duration: 0.2s;
+}
+
+.menu ul li:first-child{
+    border-bottom: 2px solid black;
+}
+
+.menu ul li:hover{
+    background-color: rgba(130, 130, 130, 0.6);
+    cursor: pointer;
+}
+
+.manageStock{
+    list-style-type: none;
+    padding: 0;
+}
+
+.manageStock li{
+    border-bottom: 2px solid black;
+    padding: 0.25rem 0rem;
+}
+
+.manageStock li:last-child{
+    border-bottom: none;
+}
+
+button{
+    background-color: #001270;
+    color: white;
+    margin-right: 0.5rem;
+}

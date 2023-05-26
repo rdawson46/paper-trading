@@ -125,8 +125,12 @@ def dashboard(user):
     # need to get account balance and account number
     balance = db.execute(text('SELECT balance from balances WHERE username = :username'), {'username':user}).fetchone()[0]
     
+    stocks = db.execute(text('SELECT syml from purchases WHERE username = :username'), {'username': user}).fetchall()
+
+    stocks = list(map(lambda x: x[0], stocks))
+    
     # need to update balance
-    return render_template('dashboard.html', user=user, balance=balance)
+    return render_template('dashboard.html', user=user, balance=balance, stocks=stocks)
 
 @app.route('/manage/<string:user>')
 def manage(user):
@@ -136,7 +140,9 @@ def manage(user):
     if username != user:
         return redirect('/')
     
-    return render_template('manage.html', user=user)
+    stocks = list(map(lambda x: x[0], db.execute(text('SELECT syml from purchases WHERE username = :username'), {'username':user}).fetchall()))
+    
+    return render_template('manage.html', user=user, stocks=stocks)
 
 @app.route('/settings/<string:user>')
 def settings(user):

@@ -5,5 +5,15 @@
 {% endblock %}
 
 {% block body %}
-    <h1>welcome to manage</h1>
+    <h1>Manage</h1>
+    <button>Buy Stocks</button>
+    {% if stocks %}
+        <div class="pane">
+            <ul class="manageStock">
+            {% for stock in stocks %}
+                <li><h2>{{stock}}</h2><button>Buy</button><button>Sell</button></li>
+            {% endfor %}
+            </ul>
+        </div>
+    {% endif %}
 {% endblock %}

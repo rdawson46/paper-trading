@@ -8,6 +8,19 @@
     <h1>Dashboard</h1>
     <div class="pane">
         <h1>{{ user }}</h1>
-        <h1>${{ balance }}</h1>
+        <h2>${{ balance }}</h2>
+    </div>
+
+    <div class="pane">
+        <h1>Stocks</h1>
+        {% if not stocks %}
+            <h2>None Purchased</h2>
+        {% endif %}
+
+        <ul>
+        {% for stock in stocks %}
+            <li><h3>{{stock}}</h3></li>
+        {% endfor %}
+        </ul>
     </div>
 {% endblock %}
