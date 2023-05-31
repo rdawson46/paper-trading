@@ -1,6 +1,7 @@
 from dotenv.main import load_dotenv
 import os
 import requests
+from time import sleep
 
 
 """
@@ -21,12 +22,17 @@ class StockAPI:
     def getPrice(self, symbol):
         query = f'query?function=GLOBAL_QUOTE&symbol={symbol}&apikey={self.key}'
 
-        r= requests.get(self.url+query)
+        r = requests.get(self.url+query)
         data = r.json()
 
-        print(data['Global Quote']['05. price'])
+        if 'Note' in data:
+            sleep(3)
+            value = self.getPrice(symbol)
+            return value
 
-    def buyStock(self, symbol, money):
+        return data['Global Quote']['05. price']
+
+    def buyStock(self, symbol, money)-> list[float]:
         # gets the price and then math
         sharePrice = self.getPrice(symbol)
 
@@ -35,5 +41,6 @@ class StockAPI:
         return [shares, sharePrice]
 
 
-attempt = StockAPI()
-attempt.getPrice('crox')
+if __name__ == '__main__':
+    attempt = StockAPI()
+    print(attempt.getPrice('aapl'))
