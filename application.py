@@ -1,5 +1,5 @@
 from functions import validEmail, validPass
-from SystemAPI.stocks import StockAPI
+from SystemAPI.stocksV2 import StockAPI
 
 import os # used for getting enviroment variables set during execution
 import requests # find an api for getting stock prices, use .env file for hiding the api key
@@ -129,12 +129,17 @@ def dashboard(user):
     # need to get account balance and account number
     balance = db.execute(text('SELECT balance from balances WHERE username = :username'), {'username':user}).fetchone()[0]
     
-    stocks = db.execute(text('SELECT syml from purchases WHERE username = :username'), {'username': user}).fetchall()
+    stocks = db.execute(text('SELECT syml, shares from purchases WHERE username = :username'), {'username': user}).fetchall()
 
-    stocks = list(map(lambda x: x[0], stocks))
+    stocks = list(map(lambda x: [x[0], int(x[1])], stocks))
+
+    value = 0
+
+    for pair in stocks:
+        pair.append(stockAPI.getPrice(pair[0]) * pair[1])
+        value += pair[2]
     
-    # need to update balance
-    return render_template('dashboard.html', user=user, balance=balance, stocks=stocks)
+    return render_template('dashboard.html', user=user, balance=balance, stocks=stocks, value=value)
 
 @app.route('/manage/<string:user>')
 def manage(user):
@@ -144,7 +149,7 @@ def manage(user):
     if username != user:
         return redirect('/')
     
-    stocks = list(map(lambda x: x[0], db.execute(text('SELECT syml from purchases WHERE username = :username'), {'username':user}).fetchall()))
+    stocks = list(map(lambda x: [x[0], int(x[1])], db.execute(text('SELECT syml, shares from purchases WHERE username = :username'), {'username':user}).fetchall()))
     
     return render_template('manage.html', user=user, stocks=stocks)
 
@@ -163,6 +168,7 @@ def search(user):
     stocks = []
     if request.method == 'POST':
         if request.form.get('search').strip() != '':
+            # seaching part of method, assign search results into stocks list
             ...
     return render_template('search.html', user=user, stocks=stocks)
 

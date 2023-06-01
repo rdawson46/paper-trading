@@ -7,13 +7,13 @@
 {% block body %}
     <h1>Manage</h1>
     <form action="{{ url_for('search', user= user)}}" method="get">
-        <button>Buy Stocks</button>
+        <button>Search for Stocks</button>
     </form>
     {% if stocks %}
         <div class="pane">
             <ul class="manageStock">
             {% for stock in stocks %}
-                <li><h2>{{stock}}</h2><button data-stock="{{stock}}">Buy</button><button data-stock="{{stock}}">Sell</button></li>
+                <li><h2>{{stock[0]}}</h2><h4 style="margin-left: 2rem;">Shares: {{stock[1]}}</h4><button data-stock="{{stock[0]}}">Buy</button><button data-stock="{{stock[0]}}">Sell</button></li>
             {% endfor %}
             </ul>
         </div>

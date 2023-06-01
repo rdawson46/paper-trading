@@ -1,6 +1,4 @@
 import re
-from datetime import datetime
-from pytz import timezone
 
 regex = r"\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,7}\b"
 
@@ -21,12 +19,3 @@ def validEmail(email:str)->bool:
     if(re.fullmatch(regex, email)):
         return True
     return False
-
-
-def isValidTime()->bool:
-    """
-    determines if it is during trading hours
-    """
-    time = datetime.now(timezone('US/Eastern')).hour
-    return  time >= 9 and time < 17
-

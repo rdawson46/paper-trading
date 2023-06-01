@@ -122,9 +122,16 @@ button:hover{
     background-color: #0045a0;
 }
 
+.owned-list{
+    list-style-type: none;
+}
+
+.owned{
+
+}
 
 /* ========================================================= */
-h1 {
+.h1 {
   display: block;
   margin: 0 auto 25px auto;
   text-align: center;
@@ -132,14 +139,7 @@ h1 {
   font-weight: 600;
   letter-spacing: -0.055em;
 }
-h2 {
-  display: block;
-  margin: 0 auto 60px auto;
-  text-align: center;
-  font-weight: 400;
-  font-size: 1.25em;
-  letter-spacing: -0.015em;
-}
+
 .container {
   position: relative;
   margin: calc(75px + 2vh + 2vw) auto 0 auto;

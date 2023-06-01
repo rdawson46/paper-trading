@@ -8,7 +8,8 @@
     <h1>Dashboard</h1>
     <div class="pane">
         <h1>{{ user }}</h1>
-        <h2>${{ balance }}</h2>
+        <h2>Balance: ${{ balance }}</h2>
+        <h2>Value: ${{value}}</h2>
     </div>
 
     <div class="pane">
@@ -17,10 +18,14 @@
             <h2>None Purchased</h2>
         {% endif %}
 
-        <ul>
-        {% for stock in stocks %}
-            <li><h3>{{stock}}</h3></li>
-        {% endfor %}
+        <ul class="owned-list">
+            {% for stock in stocks %}
+                <li class="owned">
+                    <h3>{{stock[0]}}</h3>
+                    <h4 style="margin-left: 2rem;">Shares: {{stock[1] }}</h4>
+                    <h4 style="margin-left: 2rem;">Value: ${{stock[2]}}</h4>
+                </li>
+            {% endfor %}
         </ul>
     </div>
 {% endblock %}

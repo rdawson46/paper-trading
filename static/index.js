@@ -8,7 +8,6 @@ addEventListener("DOMContentLoaded", ()=>{
 
         if(text == 'Buy'){
             element.addEventListener('click', (event)=>{
-                console.log('clicked')
                 let stock = event.target.dataset.stock
                 
                 socket.emit('price', {'stock': stock});

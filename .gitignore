@@ -17,5 +17,3 @@ __pycache__
 flask_session
 
 CloudFunctions
-
-stocksV2.py
