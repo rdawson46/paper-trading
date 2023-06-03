@@ -89,3 +89,20 @@ article{
     font-size: 24px;
     text-align: center;
 }
+
+.square-holder{
+    display: flex;
+    flex-direction: row;
+    width: 50%;
+    justify-content: space-between;
+    margin-top: 2rem;
+}
+
+.square{
+    background-color: #d53867;
+    border-radius: 16px;
+    height: 144px;
+    width: 90px;
+    text-align: center;
+    box-shadow: 4px 8px 2px #444;
+}

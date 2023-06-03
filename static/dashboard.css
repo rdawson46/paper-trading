@@ -130,6 +130,18 @@ button:hover{
 
 }
 
+dialog::backdrop{
+    background-color: rgba(50,50,50, 0.35);
+}
+
+dialog{
+    border-radius: 12px;
+}
+
+.button-holder{
+    margin-top: 10px;
+}
+
 /* ========================================================= */
 .h1 {
   display: block;

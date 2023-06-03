@@ -131,14 +131,23 @@ def dashboard(user):
     
     stocks = db.execute(text('SELECT syml, shares from purchases WHERE username = :username'), {'username': user}).fetchall()
 
-    stocks = list(map(lambda x: [x[0], int(x[1])], stocks))
+    stocks = list(map(lambda x: [x[0], float(x[1])], stocks))
 
     value = 0
 
     for pair in stocks:
-        pair.append(stockAPI.getPrice(pair[0]) * pair[1])
-        value += pair[2]
+        completed = False
+        
+        while not completed:
+            try:
+                pair.append(stockAPI.getPrice(pair[0]) * pair[1])
+                value += pair[2]
+                completed = True
+            except:
+                continue
     
+    value = round(value, 2)
+
     return render_template('dashboard.html', user=user, balance=balance, stocks=stocks, value=value)
 
 @app.route('/manage/<string:user>')
@@ -149,7 +158,7 @@ def manage(user):
     if username != user:
         return redirect('/')
     
-    stocks = list(map(lambda x: [x[0], int(x[1])], db.execute(text('SELECT syml, shares from purchases WHERE username = :username'), {'username':user}).fetchall()))
+    stocks = list(map(lambda x: [x[0], float(x[1])], db.execute(text('SELECT syml, shares from purchases WHERE username = :username'), {'username':user}).fetchall()))
     
     return render_template('manage.html', user=user, stocks=stocks)
 
@@ -165,6 +174,12 @@ def settings(user):
 
 @app.route('/search/<string:user>', methods=['GET', 'POST'])
 def search(user):
+    if not (username:=session.get('username')):
+        return redirect('/')
+    
+    if username != user:
+        return redirect('/')
+    
     stocks = []
     if request.method == 'POST':
         if request.form.get('search').strip() != '':
@@ -182,12 +197,100 @@ def logout():
 def not_found(parm):
     return make_response(render_template('index.html'), 404)
 
+
+
+# socket functions=================================================
+
+
 @socketio.on('price')
 def getPrice(data):
     stock = data['stock']
+    method = data['method']
     
     value = stockAPI.getPrice(stock)
 
-    emit('priceReturn', {'value': value})
+    emit('priceReturn', {'value': value, 'stock': stock, 'method': method})
+
+@socketio.on('buy')
+def buyStock(data):
+    if not (username:=session.get('username')):
+        return None
+    
+    stock = data['stock']
+    amount = data['amount']
+
+    # check if valid operation
+    balance = list(map(lambda x: x[0],db.execute(text("SELECT balance FROM balances WHERE username = :username"), {'username': username}).fetchall()))[0]
+
+    if amount > balance or amount == 0:
+        return 
+
+    res = stockAPI.buy_stock(stock, amount)
+
+    shares = res[0]
+    sharePrice = res[1]
+
+    # db handling
+    # check if some is already owned
+    result = db.execute(text('SELECT * FROM purchases WHERE username = :username AND syml = :syml'), {'username': username, 'syml': stock})
+    if result.rowcount != 0:
+        # if so, update
+        result = result.fetchall()[2]
+
+        newValue = result + shares
+
+        db.execute(text('UPDATE purchases SET shares = :shares WHERE username = :username AND syml = :syml'), {'shares':newValue, 'username': username, 'syml': stock})
+        db.commit()
+
+    # else add
+    else:
+        db.execute(text('INSERT INTO purchases (username, shares, syml) VALUES (:username, :shares, syml)'), {'username': username, 'shares': shares, 'syml': stock})
+        db.commit
+    
+    # update balance
+    db.execute(text('UPDATE balances SET balances = :balance WHERE username = :username'), {'balance': (balance - amount), 'username': username})
+    db.commit()
+
+    emit('returnBuy', {'shares':shares, 'sharePrice':sharePrice})
+
+
+@socketio.on('sell')
+def sellStock(data):
+    if not (username:=session.get('username')):
+        return None
+    
+    stock = data['stock']
+    shares = data['shares']
+    
+    # check if valid operation
+    stockCount = list(map(lambda x: x[0], db.execute(text('SELECT shares FROM purchases WHERE username = :username AND syml = :syml'), {'username':username, 'syml': stock}).fetchall()))
+
+    if shares > stockCount or shares == 0:
+        return
+
+    res = stockAPI.sell_stock(stock, shares)
+
+    amount = res[0]
+    sharePrice = res[1]
+
+    # db handling
+    remaining = stockCount - shares
+
+    if not remaining:
+        # delete from db
+        db.execute(text('DELETE FROM purchases WHERE username = :username AND syml = :syml'), {'username':username, 'syml':stock})
+        db.commit()
+    else:
+        # update in db
+        db.execute(text('UPDATE purchases SET shares = :shares WHERE username = :username AND syml = :syml'), {'shares': remaining, 'username': username, 'syml': stock})
+        db.commit()
+
+    # edit balance
+    balance = list(map(lambda x: x[0], db.execute(text('SELECT balance FROM balances WHERE username = :username'), {'username': username}).fetchone()))[0] + amount
+
+    db.execute(text('UPDATE balances SET balance = :balance WHERE username = :username'), {'balance': balance, 'username':username})
+    db.commit()
+
+    emit('returnSell', {'amount': amount, 'sharePrice':sharePrice})
 
 app.run(debug=True, threaded=True)
