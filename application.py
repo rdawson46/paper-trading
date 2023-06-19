@@ -1,8 +1,8 @@
 from functions import validEmail, validPass
 from SystemAPI.stocksV2 import StockAPI
+from database.database import Database
 
-import os # used for getting enviroment variables set during execution
-import requests # find an api for getting stock prices, use .env file for hiding the api key
+import os
 from dotenv.main import load_dotenv
 
 from flask import Flask, render_template, request, jsonify, redirect, make_response, session
@@ -37,11 +37,13 @@ Session(app)
 engine = create_engine(os.getenv("DATABASE_URL"))
 db = scoped_session(sessionmaker(bind=engine))
 
+database = Database()
 
 stockAPI = StockAPI()
 
 @app.route("/")
 def index():
+    session.clear()
     return render_template('index.html')
 
 @app.route("/about")
@@ -67,27 +69,16 @@ def register():
         if username.strip() == "" or email.strip() == "" or password1.strip() == "":
             return render_template('register.html', error="Invalid inputs")
         
-        elif not validPass(password1):
-            return render_template('register.html', error="Password is not valid")
-        
-        elif not validEmail(email):
-            return render_template('register.html', error="Invalid email")
+        elif not validPass(password1) or not validEmail(email):
+            return render_template('register.html', error="Invalid inputs")
         
         elif password1 != password2:
             return render_template('register.html', error="Passwords do not match")
-        
 
-        # make sure account doesn't already exist by username or email
-        if db.execute(text("SELECT * FROM users WHERE username = :username"), {'username': username}).rowcount != 0:
-            return render_template('register.html', error="Username already in use")
-        
-        elif db.execute(text("SELECT * FROM users WHERE email = :email"), {'email':email}).rowcount != 0:
-            return render_template('register.html', error="Email already in use")
+        result = database.register(db, email, username, password1)
 
-        # creates account and balance and assigns session variable
-        db.execute(text('INSERT INTO users (username, email, pass) VALUES (:username, :email, :password)'), {'username': username, 'email':email, 'password': password1})
-        db.execute(text('INSERT INTO balances (username, balance) VALUES (:username, :balance)'), {'username': username, 'balance': 0})
-        db.commit()
+        if not result[0]:
+            return render_template('register.html', error=result[1])
 
         session['username'] = username
 
@@ -103,14 +94,14 @@ def login():
         email = request.form.get('email')
         password = request.form.get('password')
 
-        result = db.execute(text("SELECT username FROM users WHERE email = :email AND pass = :pass"), {'email': email, 'pass':password})
-
-        if result.rowcount != 0:
-            # get username and load the dashboard and make the session token
-            result = result.fetchone()
-
-            user = result[0]
+        #result = db.execute(text("SELECT username FROM users WHERE email = :email AND pass = :pass"), {'email': email, 'pass':password})
+        
+        # if result.rowcount != 0:
+        if user:=database.login(db, email, password):
             session['username'] = user
+
+            if user == 'admin':
+                return redirect('/admin')
 
             return redirect(f'/dashboard/{user}')
 
@@ -127,11 +118,10 @@ def dashboard(user):
         return redirect('/')
     
     # need to get account balance and account number
-    balance = db.execute(text('SELECT balance from balances WHERE username = :username'), {'username':user}).fetchone()[0]
+    balance = database.getBalance(db, user)
     
-    stocks = db.execute(text('SELECT syml, shares from purchases WHERE username = :username'), {'username': user}).fetchall()
 
-    stocks = list(map(lambda x: [x[0], float(x[1])], stocks))
+    stocks = database.getStocks(db, user)
 
     value = 0
 
@@ -158,8 +148,8 @@ def manage(user):
     if username != user:
         return redirect('/')
     
-    stocks = list(map(lambda x: [x[0], float(x[1])], db.execute(text('SELECT syml, shares from purchases WHERE username = :username'), {'username':user}).fetchall()))
-    
+    stocks = database.getStocks(db, user)
+
     return render_template('manage.html', user=user, stocks=stocks)
 
 @app.route('/settings/<string:user>')
@@ -197,7 +187,29 @@ def logout():
 def not_found(parm):
     return make_response(render_template('index.html'), 404)
 
+@app.errorhandler(500)
+def broke(parm):
+    session.clear()
+    return make_response(render_template('index.html'), 500)
 
+
+# admin functions==================================================
+
+@app.route('/admin')
+def admin_page():
+    if session.get('username') != 'admin':
+        return redirect('/')
+    
+    # get all users and return a dashboard
+        # set up html template
+        # designate its own js file
+
+    users = database.getAllUsers(db)
+    balance = database.getAllBalances(db)
+
+    return render_template('admin.html', users=users, balance=balance)
+
+    
 
 # socket functions=================================================
 
@@ -217,10 +229,11 @@ def buyStock(data):
         return None
     
     stock = data['stock']
-    amount = data['amount']
+    amount = float(data['amount'])
 
     # check if valid operation
-    balance = list(map(lambda x: x[0],db.execute(text("SELECT balance FROM balances WHERE username = :username"), {'username': username}).fetchall()))[0]
+    # balance = list(map(lambda x: x[0],db.execute(text("SELECT balance FROM balances WHERE username = :username"), {'username': username}).fetchall()))[0]
+    balance = database.getBalance(db, username)
 
     if amount > balance or amount == 0:
         return 
@@ -232,24 +245,32 @@ def buyStock(data):
 
     # db handling
     # check if some is already owned
-    result = db.execute(text('SELECT * FROM purchases WHERE username = :username AND syml = :syml'), {'username': username, 'syml': stock})
-    if result.rowcount != 0:
+    # result = db.execute(text('SELECT * FROM purchases WHERE username = :username AND syml = :syml'), {'username': username, 'syml': stock})
+    
+    result = database.getStock(db, username, stock)
+    # if result.rowcount != 0:
+    if result:
         # if so, update
-        result = result.fetchall()[2]
+        # result = result.fetchall()[2]
+        result = result[2]
 
         newValue = result + shares
 
-        db.execute(text('UPDATE purchases SET shares = :shares WHERE username = :username AND syml = :syml'), {'shares':newValue, 'username': username, 'syml': stock})
-        db.commit()
+        # db.execute(text('UPDATE purchases SET shares = :shares WHERE username = :username AND syml = :syml'), {'shares':newValue, 'username': username, 'syml': stock})
+        # db.commit()
+
+        database.updateStock(db, username, stock, newValue)
 
     # else add
     else:
-        db.execute(text('INSERT INTO purchases (username, shares, syml) VALUES (:username, :shares, syml)'), {'username': username, 'shares': shares, 'syml': stock})
-        db.commit
+        # db.execute(text('INSERT INTO purchases (username, shares, syml) VALUES (:username, :shares, syml)'), {'username': username, 'shares': shares, 'syml': stock})
+        # db.commit
+        database.addStock(db, username, stock, shares)
     
     # update balance
-    db.execute(text('UPDATE balances SET balances = :balance WHERE username = :username'), {'balance': (balance - amount), 'username': username})
-    db.commit()
+    # db.execute(text('UPDATE balances SET balances = :balance WHERE username = :username'), {'balance': (balance - amount), 'username': username})
+    # db.commit()
+    database.updateBalance(db, (balance - amount), username)
 
     emit('returnBuy', {'shares':shares, 'sharePrice':sharePrice})
 
@@ -260,10 +281,13 @@ def sellStock(data):
         return None
     
     stock = data['stock']
-    shares = data['shares']
+    shares = float(data['shares'])
     
     # check if valid operation
-    stockCount = list(map(lambda x: x[0], db.execute(text('SELECT shares FROM purchases WHERE username = :username AND syml = :syml'), {'username':username, 'syml': stock}).fetchall()))
+    try:
+        stockCount = (list(map(lambda x: x[0], db.execute(text('SELECT shares FROM purchases WHERE username = :username AND syml = :syml'), {'username':username, 'syml': stock}).fetchall()))[0])
+    except:
+        return
 
     if shares > stockCount or shares == 0:
         return
@@ -274,7 +298,7 @@ def sellStock(data):
     sharePrice = res[1]
 
     # db handling
-    remaining = stockCount - shares
+    remaining = float(stockCount) - shares
 
     if not remaining:
         # delete from db
@@ -286,11 +310,12 @@ def sellStock(data):
         db.commit()
 
     # edit balance
-    balance = list(map(lambda x: x[0], db.execute(text('SELECT balance FROM balances WHERE username = :username'), {'username': username}).fetchone()))[0] + amount
+    balance = float(list(map(lambda x: x[0], db.execute(text('SELECT balance FROM balances WHERE username = :username'), {'username': username}).fetchall()))[0]) + amount
 
     db.execute(text('UPDATE balances SET balance = :balance WHERE username = :username'), {'balance': balance, 'username':username})
     db.commit()
 
     emit('returnSell', {'amount': amount, 'sharePrice':sharePrice})
+
 
 app.run(debug=True, threaded=True)

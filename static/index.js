@@ -1,3 +1,5 @@
+let stock;
+
 addEventListener("DOMContentLoaded", ()=>{
     const socket = io();
 
@@ -50,6 +52,10 @@ addEventListener("DOMContentLoaded", ()=>{
     buy_button.forEach(element=>{
         element.addEventListener('click', event=>{
             console.log('buy')
+
+            // need stock and amount of money
+            // get money from input and stock from ?
+            
         });
     });
 
@@ -60,6 +66,11 @@ addEventListener("DOMContentLoaded", ()=>{
             console.log('sell')
             
             // find a way to get data to emit
+            // need stock and # of shares
+            // get share # from input and stock from ?
+            let amount = document.getElementById('sell-amount').value;
+
+            socket.emit('sell', {'stock': stock, 'shares': amount})
         });
     });
     
@@ -69,8 +80,8 @@ addEventListener("DOMContentLoaded", ()=>{
     socket.on('priceReturn', (data)=>{
         // add pop up window for dollar amount
         let value = data.value;
-        let stock = data.stock;
         let method = data.method;
+        stock = data.stock;
 
         if(method == 'buy'){
             document.getElementById('buy-text').innerText = `Buy ${stock} for ${value} per share`
