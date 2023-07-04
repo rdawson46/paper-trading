@@ -319,5 +319,17 @@ def hello(data):
 
     return {'price':price}
 
+@socketio.on('delete')
+def deleteUser(data):
+    user = data.get('user', None)
+    email = data.get('email', None)
+
+    if user is None or email is None or session.get('username') != 'admin':
+        return False
+
+    res = database.deleteUser(db, user, email)
+
+    return res
+
 
 app.run(debug=True, threaded=True)

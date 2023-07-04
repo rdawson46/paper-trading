@@ -74,6 +74,16 @@ class Database:
     
 
 
+    def deleteUser(self, db:scoped_session[Session], username, email):
+        try:
+            db.execute(text('DELETE FROM users WHERE username = :username and email = :email'), {'username':username, 'email':email})
+            db.execute(text('DELETE FROM balances WHERE username = :username'), {'username':username})
+            db.commit()
+            return True
+        except:
+            return False
+
+
     def getBalance(self, db:scoped_session[Session], username):
         """
         returns the values of balances for a singular user

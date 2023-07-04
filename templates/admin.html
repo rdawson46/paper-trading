@@ -4,10 +4,13 @@
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
     <title>Admin Page</title>
 
     <link rel="stylesheet" href="{{ url_for('static', filename='admin.css')}}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
 
+    <script src="https://cdn.socket.io/4.6.0/socket.io.min.js" integrity="sha384-c79GN5VsunZvi+Q/WObgk2in0CbZsHnjEqvFxC5DxHn9lTfNce2WW6h2pH6u/kF+" crossorigin="anonymous"></script>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.4/jquery.min.js"></script>
     <script src="{{ url_for('static', filename='admin.js')}}"></script>
 </head>
@@ -23,37 +26,45 @@
         </header>
 
         <h1>Admin Page</h1>
-
-        <h3>Users List</h3>
+        
         <table>
-            <tr>
-                <th>Username</th>
-                <th>Email</th>
-                <th>Password</th>
-            </tr>
-
-            {% for user in users %}
+            <caption>Users List</caption>
+            <thead>
                 <tr>
-                    <td>{{user[0]}}</td>
-                    <td>{{user[1]}}</td>
-                    <td>{{user[2]}}</td>
+                    <th>Username</th>
+                    <th>Email</th>
+                    <th>Password</th>
+                    <th>Delete</th>
                 </tr>
-            {% endfor %}
+            </thead>
+            <tbody>
+                {% for user in users %}
+                    <tr>
+                        <td>{{user[0]}}</td>
+                        <td>{{user[1]}}</td>
+                        <td>{{user[2]}}</td>
+                        <td><button id="delete-button" data-email="{{user[1]}}" data-user="{{user[0]}}"><i class="fa fa-trash" style="color:red;"></i></button></td>
+                    </tr>
+                {% endfor %}
+            </tbody>
         </table>
 
-        <h3>Balances</h3>
         <table>
-            <tr>
-                <th>Username</th>
-                <th>Balance</th>
-            </tr>
-
-            {% for user in balance %}
+            <caption>Balances</caption>
+            <thead>
                 <tr>
-                    <td>{{user[0]}}</td>
-                    <td>{{user[1]}}</td>
+                    <th>Username</th>
+                    <th>Balances</th>
                 </tr>
-            {% endfor %}
+            </thead>
+            <tbody>
+                {% for user in balance %}
+                    <tr>
+                        <td>{{user[0]}}</td>
+                        <td>{{user[1]}}</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
         </table>
     </main>
 </body>
