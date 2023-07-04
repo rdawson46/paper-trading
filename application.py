@@ -169,13 +169,8 @@ def search(user):
     
     if username != user:
         return redirect('/')
-    
     stocks = []
-    if request.method == 'POST':
-        if request.form.get('search').strip() != '':
-            # seaching part of method, assign search results into stocks list
-            ...
-    return render_template('search.html', user=user, stocks=stocks)
+    return make_response(render_template('search.html', user=user, stocks=stocks), 200)
 
 @app.route('/logout')
 def logout():
@@ -316,6 +311,13 @@ def sellStock(data):
     db.commit()
 
     emit('returnSell', {'amount': amount, 'sharePrice':sharePrice})
+
+@socketio.on('hello')
+def hello(data):
+    stock = data['symbol']
+    price = stockAPI.getPrice(stock)
+
+    return {'price':price}
 
 
 app.run(debug=True, threaded=True)

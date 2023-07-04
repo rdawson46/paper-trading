@@ -108,6 +108,7 @@ button{
     background-color: #001270;
     color: white;
     margin-right: 0.5rem;
+    margin-left: 0.5rem;
     border: none;
     padding: 15px 32px;
     text-align: center;
@@ -116,6 +117,8 @@ button{
     font-size: 16px;
     transition-duration: 0.1s;
     cursor: pointer;
+    border-radius: 10px;
+    /* max-width: 250px; */
 }
 
 button:hover{
@@ -227,3 +230,23 @@ dialog{
 #search:-moz-placeholder {color: #FFFFFF;}
 #search::-moz-selection {color: #FFFFFF; background: rgba(0,0,0,0.25);}
 #search::selection {color: #FFFFFF; background: rgba(0,0,0,0.25);}
+
+#stock-list{
+    list-style: none;
+}
+
+.searchedStock{
+    font-size: 18px;
+    background-color: #dfdfdf;
+    color: #232323;
+    border-radius: 24px;
+    padding: 10px;
+    display: flex;
+    flex-direction: column;
+    
+}
+
+.search-button{
+    align-self: flex-start;
+    margin-top: 0.5rem;
+}

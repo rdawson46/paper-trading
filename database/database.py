@@ -1,8 +1,19 @@
 from sqlalchemy.orm import scoped_session, Session
 from sqlalchemy.sql import text
-from typing import List, Union
+from typing import Union
+
+from cryptography.fernet import Fernet
+from dotenv.main import load_dotenv
+import os
+from random import randint as salt
 
 class Database:
+    def __init__(self):
+        load_dotenv(dotenv_path='./../env')
+
+        db_key = os.getenv('FERNETKEY')
+        self.cipher = Fernet(db_key)
+
     def getAllUsers(self, db: scoped_session[Session]):
         """
         return all values from the users table
@@ -31,6 +42,10 @@ class Database:
         """
         will return a value if user exists, none if else
         """
+        # encoded = self.cipher.encrypt(bytes(password, encoding='utf-8')).decode('utf-8')
+
+        # print(encoded)
+
         if (result:=db.execute(text("SELECT * FROM users WHERE email = :email AND pass = :password"), {'email':email, 'password': password})).rowcount == 0:
             return None
         
