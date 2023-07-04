@@ -64,8 +64,8 @@ table{
 }
 
 th, td{
-    border: 2px solid black;
-    padding: 8px;
+    border: 1px solid #343434;
+    padding: 8px 4px;
 }
 
 thead, th{

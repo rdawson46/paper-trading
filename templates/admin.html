@@ -33,7 +33,6 @@
                 <tr>
                     <th>Username</th>
                     <th>Email</th>
-                    <th>Password</th>
                     <th>Delete</th>
                 </tr>
             </thead>
@@ -42,7 +41,6 @@
                     <tr>
                         <td>{{user[0]}}</td>
                         <td>{{user[1]}}</td>
-                        <td>{{user[2]}}</td>
                         <td><button id="delete-button" data-email="{{user[1]}}" data-user="{{user[0]}}"><i class="fa fa-trash" style="color:red;"></i></button></td>
                     </tr>
                 {% endfor %}

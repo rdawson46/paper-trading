@@ -42,14 +42,18 @@ class Database:
         """
         will return a value if user exists, none if else
         """
-        # encoded = self.cipher.encrypt(bytes(password, encoding='utf-8')).decode('utf-8')
-
-        # print(encoded)
-
-        if (result:=db.execute(text("SELECT * FROM users WHERE email = :email AND pass = :password"), {'email':email, 'password': password})).rowcount == 0:
+        
+        if (result:=db.execute(text('SELECT * FROM users WHERE email = :email'), {'email':email})).rowcount == 0:
             return None
         
-        return result.fetchone()[0]
+        result = result.fetchone()
+        
+        decoded = self.cipher.decrypt(bytes(result[2], 'utf-8')).decode('utf-8')
+
+        if decoded != password:
+            return None
+
+        return result[0]
     
 
 
@@ -65,6 +69,8 @@ class Database:
             return [False, "Email already in use"]
         elif usernameResult.rowcount > 0:
             return [False, "Username already in use"]
+        
+        password = self.cipher.encrypt(bytes(password, encoding='utf-8')).decode('utf-8')
         
         db.execute(text('INSERT INTO users (username, email, pass) VALUES (:username, :email, :password)'), {'username': username, 'email':email, 'password': password})
         db.execute(text('INSERT INTO balances (username, balance) VALUES (:username, :balance)'), {'username': username, 'balance': 0})
