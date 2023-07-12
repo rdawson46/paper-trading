@@ -312,7 +312,7 @@ def sellStock(data):
 
     emit('returnSell', {'amount': amount, 'sharePrice':sharePrice})
 
-@socketio.on('hello')
+@socketio.on('search')
 def hello(data):
     stock = data['symbol']
     price = stockAPI.getPrice(stock)

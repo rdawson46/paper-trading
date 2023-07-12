@@ -56,8 +56,10 @@ header li a {
 }
 
 .pane{
-    background-color: rgba(255, 255, 255, 0.6); 
-    color: black;
+    /* background-color: rgba(255, 255, 255, 0.6);  */
+    /* background-color: #00243d; */
+    background-color: rgba(0,36, 61, 0.9);
+    color: #fcfcfc;
     border-radius: 12px;
     margin: 1rem;
     padding: 0.25rem 0.5rem;
@@ -249,4 +251,19 @@ dialog{
 .search-button{
     align-self: flex-start;
     margin-top: 0.5rem;
+}
+
+@keyframes append-animate{
+    from{
+        transform: translateX(-100%);
+        opacity: 0;
+    }
+    to{
+        transform: translateX(0);
+        opacity: 1;
+    }
+}
+
+.new-stock{
+    animation: append-animate 0.15s linear;
 }

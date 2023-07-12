@@ -84,6 +84,7 @@ class Database:
         try:
             db.execute(text('DELETE FROM users WHERE username = :username and email = :email'), {'username':username, 'email':email})
             db.execute(text('DELETE FROM balances WHERE username = :username'), {'username':username})
+            db.execute(text('DELETE FROM purchases WHERE username = :username'), {'username':username})
             db.commit()
             return True
         except:
