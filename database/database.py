@@ -103,7 +103,7 @@ class Database:
         """
         update balance amount for a user
         """
-        db.execute(text('UPDATE balances SET balances = :balance WHERE username = :username'), {'balance': balance, 'username': username})
+        db.execute(text('UPDATE balances SET balance = :balance WHERE username = :username'), {'balance': balance, 'username': username})
         db.commit()
         return True
 

@@ -239,8 +239,10 @@ dialog{
 
 .searchedStock{
     font-size: 18px;
-    background-color: #dfdfdf;
-    color: #232323;
+    /* background-color: #dfdfdf; */
+    background-color: rgba(0,36, 61, 0.9);
+    /* color: #232323; */
+    color: white;
     border-radius: 24px;
     padding: 10px;
     display: flex;
@@ -265,5 +267,6 @@ dialog{
 }
 
 .new-stock{
-    animation: append-animate 0.15s linear;
+    animation: append-animate 0.25s ease-out;
+    margin-bottom: 0.5rem;
 }

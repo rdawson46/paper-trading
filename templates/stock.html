@@ -1,0 +1,10 @@
+{% extends 'dash-layout.html' %}
+
+{% block heading %}
+    {{symbol.upper()}}
+{% endblock %}
+
+{% block body %}
+    <h1>{{symbol.upper()}}</h1>
+    <p>{{data}}</p>
+{% endblock %}

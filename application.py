@@ -137,6 +137,7 @@ def dashboard(user):
                 continue
     
     value = round(value, 2)
+    balance = round(balance, 2)
 
     return render_template('dashboard.html', user=user, balance=balance, stocks=stocks, value=value)
 
@@ -177,6 +178,14 @@ def logout():
     session.pop('username', None)
 
     return redirect('/')
+
+@app.route('/<string:user>/stock/<string:symbol>')
+def stock(user, symbol):
+    if not (username:=session.get('username')) or username != user:
+        return redirect('/')
+    
+    data = stockAPI.getBar(symbol)
+    return make_response(render_template('stock.html', symbol=symbol, data=data), 200)
 
 @app.errorhandler(404)
 def not_found(parm):
@@ -228,7 +237,7 @@ def buyStock(data):
 
     # check if valid operation
     # balance = list(map(lambda x: x[0],db.execute(text("SELECT balance FROM balances WHERE username = :username"), {'username': username}).fetchall()))[0]
-    balance = database.getBalance(db, username)
+    balance = float(database.getBalance(db, username))
 
     if amount > balance or amount == 0:
         return 
@@ -245,26 +254,17 @@ def buyStock(data):
     result = database.getStock(db, username, stock)
     # if result.rowcount != 0:
     if result:
-        # if so, update
-        # result = result.fetchall()[2]
-        result = result[2]
+
+        result = float(result[2])
 
         newValue = result + shares
-
-        # db.execute(text('UPDATE purchases SET shares = :shares WHERE username = :username AND syml = :syml'), {'shares':newValue, 'username': username, 'syml': stock})
-        # db.commit()
 
         database.updateStock(db, username, stock, newValue)
 
     # else add
     else:
-        # db.execute(text('INSERT INTO purchases (username, shares, syml) VALUES (:username, :shares, syml)'), {'username': username, 'shares': shares, 'syml': stock})
-        # db.commit
         database.addStock(db, username, stock, shares)
     
-    # update balance
-    # db.execute(text('UPDATE balances SET balances = :balance WHERE username = :username'), {'balance': (balance - amount), 'username': username})
-    # db.commit()
     database.updateBalance(db, (balance - amount), username)
 
     emit('returnBuy', {'shares':shares, 'sharePrice':sharePrice})
@@ -313,7 +313,7 @@ def sellStock(data):
     emit('returnSell', {'amount': amount, 'sharePrice':sharePrice})
 
 @socketio.on('search')
-def hello(data):
+def searching(data):
     stock = data['symbol']
     price = stockAPI.getPrice(stock)
 

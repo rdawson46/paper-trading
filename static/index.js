@@ -52,9 +52,20 @@ addEventListener("DOMContentLoaded", ()=>{
     buy_button.forEach(element=>{
         element.addEventListener('click', event=>{
             console.log('buy')
-
+            
             // need stock and amount of money
             // get money from input and stock from ?
+            let amount = document.getElementById('buy-amount').value;
+            document.getElementById('buy-amount').value = '';
+
+            amount = parseFloat(amount)
+
+            if(!isNaN(amount)){
+                console.log(`amound: ${amount}`)
+                console.log(`stock: ${stock}`)
+
+                socket.emit('buy', {'stock': stock, 'amount': amount})
+            }
             
         });
     });
@@ -69,8 +80,11 @@ addEventListener("DOMContentLoaded", ()=>{
             // need stock and # of shares
             // get share # from input and stock from ?
             let amount = document.getElementById('sell-amount').value;
+            document.getElementById('sell-amount').value = ''
 
-            socket.emit('sell', {'stock': stock, 'shares': amount})
+            if(!isNaN(amount)){
+                socket.emit('sell', {'stock': stock, 'shares': amount})
+            }
         });
     });
     

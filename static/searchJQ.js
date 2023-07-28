@@ -13,6 +13,18 @@ function binarySearch(lst, string, start, end) {
     }
 }
 
+function search(lst, string){
+    result = []
+
+    lst.forEach(element=>{
+        if (element == string.slice(0, element.length) || element.slice(0, string.length) == string){
+            result.push(element)
+        }
+    });
+
+    return result;
+}
+
 const stocks = ['BRK.B', 'TSM', 'V', 'AAPL', 'GOOG', 'MSFT', 'GOOGL', 'AMZN', 'NVDA', 'TSLA', 'META', 'LLY', 'JNJ', 'JPM', 'BK', 'MA', 'NVO', 'MA', 'UNH', 'ORCL', 'BHP', 'CVX', 'ASML', 'ABBV', 'BAC', 'SHEL', 'CSCO', 'NFLX', 'AMD', 'TBC', 'NKE', 'SAP', 'DHR', 'DIS', 'WFC', 'VZ', 'RTX', 'MS', 'BMY', 'QCOM', 'BA'].sort(); // fill later
 
 $(document).ready(function () {
@@ -36,7 +48,12 @@ $(document).ready(function () {
 
         const symbol = e.target.value;
 
+        if (symbol.length == 0){
+            return;
+        }
+        
         const results = binarySearch(stocks, symbol.toUpperCase(), 0, stocks.length - 1);
+        // const results = search(stocks, symbol.toUpperCase());
 
         results.forEach(element => {
             const item = document.createElement('li');
@@ -65,5 +82,5 @@ $(document).ready(function () {
 
         });
 
-    })
+    });
 });

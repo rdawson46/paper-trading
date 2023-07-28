@@ -49,6 +49,9 @@ class StockAPI:
 
         return [amount, sharePrice]
     
+    def getBar(self, symbol):
+        return self.api.get_latest_bar(symbol)
+    
 if __name__ == '__main__':
     attempt = StockAPI()
-    print(type(attempt.getPrice('aapl')))
+    print(attempt.is_open())
