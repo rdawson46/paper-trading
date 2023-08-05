@@ -184,8 +184,25 @@ def stock(user, symbol):
     if not (username:=session.get('username')) or username != user:
         return redirect('/')
     
-    data = stockAPI.getBar(symbol)
-    return make_response(render_template('stock.html', symbol=symbol, data=data), 200)
+    # data = stockAPI.getWeekPrice(symbol)
+    data = None
+    recent = stockAPI.getPrice(symbol)
+    return make_response(render_template('stock.html', symbol=symbol, recent=recent, user=username), 200)
+
+@app.route('/<string:user>/stock/<string:symbol>/charting')
+def chart(user, symbol):
+    if not (username:=session.get('username')) or username != user:
+        return None
+    
+    data = stockAPI.getWeekPrice(symbol)
+    
+    response = make_response(jsonify({'xvals': [i[0] for i in data], 'yvals': [i[1] for i in data]}))
+    response.headers['Content-Type'] = 'application/json'
+    
+    return response
+
+
+# error pages =====================================================
 
 @app.errorhandler(404)
 def not_found(parm):
@@ -213,7 +230,6 @@ def admin_page():
 
     return render_template('admin.html', users=users, balance=balance)
 
-    
 
 # socket functions=================================================
 
@@ -314,10 +330,12 @@ def sellStock(data):
 
 @socketio.on('search')
 def searching(data):
+    if not (username:=session.get('username')):
+        return None
     stock = data['symbol']
     price = stockAPI.getPrice(stock)
 
-    return {'price':price}
+    return {'price':price, 'user':username}
 
 @socketio.on('delete')
 def deleteUser(data):

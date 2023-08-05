@@ -30,17 +30,6 @@ Search
         {% endfor %}
     </ul>
 
-    <dialog id="options">
-        <h3>Stock Name</h2>
-            <h4 id="display-price">
-        </h3>
-        <input type="number" min="0" id="amount" placeholder="Enter dollar amount" />
-        <div class="button-holder">
-            <button>Purchase</button>
-            <button>Cancel</button>
-        </div>
-    </dialog>
-
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.4/jquery.min.js"></script>
     <script src="{{ url_for('static', filename='searchJQ.js') }}"></script>
 {% endblock %}

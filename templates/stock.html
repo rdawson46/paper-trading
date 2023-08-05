@@ -5,6 +5,13 @@
 {% endblock %}
 
 {% block body %}
-    <h1>{{symbol.upper()}}</h1>
-    <p>{{data}}</p>
+    <h1 id="header" data-user="{{user}}" data-stock="{{symbol}}">{{symbol.upper()}}</h1>
+    <h2>{{recent}}</h2>
+
+    <div class="pane">
+        <canvas id="myChart" style="width: 100%;"></canvas>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.9.4/Chart.js"></script>
+    <script src="{{ url_for('static', filename='stock.js')}}"></script>
 {% endblock %}

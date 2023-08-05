@@ -65,6 +65,7 @@ $(document).ready(function () {
             socket.emit('search', { 'symbol': element }, (res) => {
                 const price = document.createElement('p');
                 price.innerText = `Stock price: ${res.price}`;
+                const user = res.user;
                 price.id = 'returned-price'
                 item.append(price);
 
@@ -73,8 +74,7 @@ $(document).ready(function () {
                 button.innerText = 'Learn More';
                 button.classList.add('search-button');
                 button.onclick = ()=>{
-                    document.getElementById('display-price').innerText = document.getElementById('returned-price').innerText;
-                    document.getElementById('options').showModal();
+                    window.location.href=`/${user}/stock/${element}`;
                 };
                 item.append(button);
                 $('#stock-list').append(item);
