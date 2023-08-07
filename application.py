@@ -184,10 +184,14 @@ def stock(user, symbol):
     if not (username:=session.get('username')) or username != user:
         return redirect('/')
     
-    # data = stockAPI.getWeekPrice(symbol)
-    data = None
     recent = stockAPI.getPrice(symbol)
-    return make_response(render_template('stock.html', symbol=symbol, recent=recent, user=username), 200)
+    shares = database.getStock(db, username, symbol)
+
+    if not shares:
+        shares = 0
+    else:
+        shares = float(shares[2])
+    return make_response(render_template('stock.html', symbol=symbol, recent=recent, user=username, shares=shares), 200)
 
 @app.route('/<string:user>/stock/<string:symbol>/charting')
 def chart(user, symbol):
@@ -195,7 +199,7 @@ def chart(user, symbol):
         return None
     
     data = stockAPI.getWeekPrice(symbol)
-    
+
     response = make_response(jsonify({'xvals': [i[0] for i in data], 'yvals': [i[1] for i in data]}))
     response.headers['Content-Type'] = 'application/json'
     

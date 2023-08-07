@@ -3,9 +3,6 @@ document.addEventListener('DOMContentLoaded', async()=>{
     const user = header.dataset.user;
     const symbol = header.dataset.stock;
 
-    console.log(user)
-    console.log(symbol)
-
     const response = await fetch(`/${user}/stock/${symbol}/charting`)
     
     if (!response.ok){
@@ -17,22 +14,17 @@ document.addEventListener('DOMContentLoaded', async()=>{
     console.log(data)
     
     // data = [[1,5], [2,6],[3,7]]
-    const xvals = data.xvals
-    const yvals = data.yvals
-    
-    // data.forEach(element => {
-    //     xvals.push(element[0]);
-    //     yvals.push(element[1]);
-    // });
-    
-    console.log(xvals)
-    console.log(yvals)
-    
+    let xvals = data.xvals
+    let yvals = data.yvals
+
+    xvals = xvals.map(elem=>{return elem.slice(5)})
+
     const myChart = new Chart('myChart',{
         type: 'line',
         data: {
             labels: xvals,
             datasets: [{
+                label: 'Price',
                 backgroundColor:"rgba(213, 56, 103, 0.3)",
                 borderColor: "rgba(213, 56, 103, 1.0)",
                 data: yvals

@@ -18,7 +18,9 @@ function search(lst, string){
 
     lst.forEach(element=>{
         if (element == string.slice(0, element.length) || element.slice(0, string.length) == string){
-            result.push(element)
+            if(!result.includes(element)){
+                result.push(element)
+            }
         }
     });
 
