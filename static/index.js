@@ -61,7 +61,7 @@ addEventListener("DOMContentLoaded", ()=>{
             amount = parseFloat(amount)
 
             if(!isNaN(amount)){
-                console.log(`amound: ${amount}`)
+                console.log(`amount: ${amount}`)
                 console.log(`stock: ${stock}`)
 
                 socket.emit('buy', {'stock': stock, 'amount': amount})
@@ -114,7 +114,8 @@ addEventListener("DOMContentLoaded", ()=>{
         let shares = data.shares;
         let sharePrice = data.sharePrice;
 
-
+        console.log(`SharePrice: ${sharePrice}`);
+        console.log(`Shares: ${shares}`);
     })
 
     socket.on('returnSell', (data)=>{
@@ -122,6 +123,6 @@ addEventListener("DOMContentLoaded", ()=>{
         let sharePrice = data.sharePrice;
 
         console.log(`Amount: ${amount}`)
-        console.log(`SharePrice = ${sharePrice}`)
+        console.log(`SharePrice: ${sharePrice}`)
     })
 });

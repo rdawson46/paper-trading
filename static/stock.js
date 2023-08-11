@@ -10,10 +10,7 @@ document.addEventListener('DOMContentLoaded', async()=>{
     }
 
     const data = await response.json();
-
-    console.log(data)
     
-    // data = [[1,5], [2,6],[3,7]]
     let xvals = data.xvals
     let yvals = data.yvals
 
