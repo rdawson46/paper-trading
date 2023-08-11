@@ -43,7 +43,7 @@ class StockAPI:
         """
         sharePrice = self.getPrice(symbol)
 
-        shares = sharePrice / amount
+        shares = amount / sharePrice
 
         return [shares, sharePrice]
 

@@ -136,6 +136,6 @@ class Database:
 
 
     def addStock(self, db:scoped_session[Session], username, syml, shares):
-        db.execute(text('INSERT INTO purchases (username, shares, syml) VALUES (:username, :shares, syml)'), {'username': username, 'shares': shares, 'syml': syml})
+        db.execute(text('INSERT INTO purchases (username, shares, syml) VALUES (:username, :shares, :syml)'), {'username': username, 'shares': shares, 'syml': syml})
         db.commit
         return True

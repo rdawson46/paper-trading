@@ -44,11 +44,11 @@ stockAPI = StockAPI()
 @app.route("/")
 def index():
     session.clear()
-    return render_template('index.html')
+    return render_template('index.html'), 200
 
 @app.route("/about")
 def about():
-    return render_template('about.html')
+    return render_template('about.html'), 200
 
 @app.route('/reset')
 def resetPassword():
@@ -259,7 +259,7 @@ def buyStock(data):
     # balance = list(map(lambda x: x[0],db.execute(text("SELECT balance FROM balances WHERE username = :username"), {'username': username}).fetchall()))[0]
     balance = float(database.getBalance(db, username))
 
-    if amount > balance or amount == 0:
+    if amount > balance or amount < 1:
         return 
 
     res = stockAPI.buy_stock(stock, amount)
@@ -354,4 +354,4 @@ def deleteUser(data):
     return res
 
 
-app.run(debug=True, threaded=True)
+app.run(debug=True, threaded=True, host='0.0.0.0')
