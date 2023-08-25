@@ -67,15 +67,6 @@ if __name__ == '__main__':
     attempt = StockAPI()
     week = attempt.getWeekPrice('aapl')
 
-    # plt.figure(figsize=(10, 8))
-    # plt.plot(train['date'], train['price'])
-    # plt.plot(test['date'], test[['price', 'predictions']])
-    # plt.title("AAPL Predictions")
-    # plt.xlabel('Date')
-    # plt.ylabel('Price')
-    # plt.legend(['Train', "Test", "Predictions"])
-    # plt.show()
-
     plt.figure(figsize=(10,8))
     plt.plot([i[0] for i in week], [i[1] for i in week])
     plt.show()

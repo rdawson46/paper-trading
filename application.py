@@ -130,7 +130,8 @@ def dashboard(user):
         
         while not completed:
             try:
-                pair.append(stockAPI.getPrice(pair[0]) * pair[1])
+                pair.append(round(stockAPI.getPrice(pair[0]) * pair[1], 2))
+                pair[1] = round(pair[1], 3)
                 value += pair[2]
                 completed = True
             except:
@@ -353,5 +354,10 @@ def deleteUser(data):
 
     return res
 
+
+# Testing Page ====================================================
+@app.route('/test')
+def tester():
+    return render_template('test.html')
 
 app.run(debug=True, threaded=True, host='0.0.0.0')

@@ -27,7 +27,7 @@ function search(lst, string){
     return result;
 }
 
-const stocks = ['BRK.B', 'TSM', 'V', 'AAPL', 'GOOG', 'MSFT', 'GOOGL', 'AMZN', 'NVDA', 'TSLA', 'META', 'LLY', 'JNJ', 'JPM', 'BK', 'MA', 'NVO', 'MA', 'UNH', 'ORCL', 'BHP', 'CVX', 'ASML', 'ABBV', 'BAC', 'SHEL', 'CSCO', 'NFLX', 'AMD', 'TBC', 'NKE', 'SAP', 'DHR', 'DIS', 'WFC', 'VZ', 'RTX', 'MS', 'BMY', 'QCOM', 'BA'].sort(); // fill later
+const stocks = ['BRK.B', 'TSM', 'V', 'AAPL', 'GOOG', 'MSFT', 'GOOGL', 'AMZN', 'NVDA', 'TSLA', 'META', 'LLY', 'JNJ', 'JPM', 'BK', 'MA', 'NVO', 'MA', 'UNH', 'ORCL', 'BHP', 'CVX', 'ASML', 'ABBV', 'BAC', 'SHEL', 'CSCO', 'NFLX', 'AMD', 'TBC', 'NKE', 'SAP', 'DHR', 'DIS', 'WFC', 'VZ', 'RTX', 'MS', 'BMY', 'QCOM', 'BA', 'voo'].sort(); // fill later
 
 $(document).ready(function () {
     $("#search").focus(function () {

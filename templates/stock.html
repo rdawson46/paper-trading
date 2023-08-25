@@ -13,11 +13,11 @@
             <br>
             Current Shares: {{shares}}
         </h2>
-        <button data-stock="{{symbol}}">Buy</button>
+        <button data-stock="{{symbol}}" class="buy-info">Buy</button>
 
         <!-- add conditional here -->
         {% if shares %}
-            <button>Sell</button>
+            <button class="sell-info">Sell</button>
         {% endif %}
         <canvas id="myChart" style="width: 100%; max-width: 900px;"></canvas>
     </div>
@@ -46,6 +46,7 @@
 
     <dialog id="resultWindow">
         <h2>Result</h2>
+        <h3 id="resultText"></h3>
     </dialog>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.9.4/Chart.js"></script>
