@@ -206,17 +206,15 @@ socket.on('returnBuy', (data)=>{
 
     document.getElementById('resultWindow').showModal();
     document.getElementById('resultText').innerHTML = `<b>Shares: </b>${shares}<br><b>Price: </b>${sharePrice}`;
-})
+});
 
-socket.on('returnBuy', (data)=>{
-    let shares = data.shares;
-    let sharePrice = data.sharePrice;
+socket.on('returnSell', (data)=>{
+         let amount = data.amount;
+         let sharePrice = data.sharePrice;
 
-    document.getElementById('sell').close()
-
-    document.getElementById('resultWindow').showModal();
-    document.getElementById('resultText').innerHTML = `<b>Shares: </b>${shares}<br><b>Price: </b>${sharePrice}`;
-})
+         console.log(`Amount: ${amount}`)
+         console.log(`SharePrice: ${sharePrice}`)
+});
 
 const buyInfo = document.querySelectorAll('.buy-info');
 const sellInfo = document.querySelectorAll('.sell-info');

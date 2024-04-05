@@ -41,19 +41,31 @@ database = Database()
 
 stockAPI = StockAPI()
 
+
 @app.route("/")
 def index():
     session.clear()
     return render_template('index.html'), 200
 
+
 @app.route("/about")
 def about():
     return render_template('about.html'), 200
 
+
 @app.route('/reset')
 def resetPassword():
     # function the will direct to html the will reset the user's password
+    # create a html page to handle this
+    # then create a route to handle sending an email to reset with special link
+    # then create a route for post request to do so
     ...
+
+
+@app.route('/reset/<string:user>')
+def resetPassForUser():
+    ...
+
 
 @app.route('/register', methods=['GET', 'POST'])
 def register():
@@ -65,13 +77,16 @@ def register():
         password1 = request.form.get('password1')
         password2 = request.form.get('password2')
 
+        if (email is None) or (email is None) or (email is None) or (email is None):
+            return render_template('register.html', error="Invalid inputs")
+
         # make sure that inputs are valid
         if username.strip() == "" or email.strip() == "" or password1.strip() == "":
             return render_template('register.html', error="Invalid inputs")
-        
+
         elif not validPass(password1) or not validEmail(email):
             return render_template('register.html', error="Invalid inputs")
-        
+
         elif password1 != password2:
             return render_template('register.html', error="Passwords do not match")
 
@@ -86,6 +101,7 @@ def register():
 
     return render_template('register.html')
 
+
 @app.route('/login', methods=['GET', 'POST'])
 def login():
     if request.method == 'POST':
@@ -94,10 +110,10 @@ def login():
         email = request.form.get('email')
         password = request.form.get('password')
 
-        #result = db.execute(text("SELECT username FROM users WHERE email = :email AND pass = :pass"), {'email': email, 'pass':password})
-        
+        # result = db.execute(text("SELECT username FROM users WHERE email = :email AND pass = :pass"), {'email': email, 'pass':password})
+
         # if result.rowcount != 0:
-        if user:=database.login(db, email, password):
+        if user := database.login(db, email, password):
             session['username'] = user
 
             if user == 'admin':
@@ -108,6 +124,7 @@ def login():
         # get from the db to check
     return render_template('login.html')
 
+
 @app.route('/dashboard/<string:user>')
 def dashboard(user):
     # check to make sure the user is logged in when requested
@@ -116,10 +133,9 @@ def dashboard(user):
 
     if username != user:
         return redirect('/')
-    
+
     # need to get account balance and account number
     balance = database.getBalance(db, user)
-    
 
     stocks = database.getStocks(db, user)
 
@@ -127,7 +143,7 @@ def dashboard(user):
 
     for pair in stocks:
         completed = False
-        
+
         while not completed:
             try:
                 pair.append(round(stockAPI.getPrice(pair[0]) * pair[1], 2))
@@ -136,43 +152,47 @@ def dashboard(user):
                 completed = True
             except:
                 continue
-    
+
     value = round(value, 2)
     balance = round(balance, 2)
 
     return render_template('dashboard.html', user=user, balance=balance, stocks=stocks, value=value)
 
+
 @app.route('/manage/<string:user>')
 def manage(user):
-    if not (username:=session.get('username')):
+    if not (username := session.get('username')):
         return redirect('/')
 
     if username != user:
         return redirect('/')
-    
+
     stocks = database.getStocks(db, user)
 
     return render_template('manage.html', user=user, stocks=stocks)
 
+
 @app.route('/settings/<string:user>')
 def settings(user):
-    if not (username:=session.get('username')):
+    if not (username := session.get('username')):
         return redirect('/')
 
     if username != user:
         return redirect('/')
-    
+
     return render_template('settings.html', user=user)
+
 
 @app.route('/search/<string:user>', methods=['GET', 'POST'])
 def search(user):
-    if not (username:=session.get('username')):
+    if not (username := session.get('username')):
         return redirect('/')
-    
+
     if username != user:
         return redirect('/')
     stocks = []
     return make_response(render_template('search.html', user=user, stocks=stocks), 200)
+
 
 @app.route('/logout')
 def logout():
@@ -180,11 +200,12 @@ def logout():
 
     return redirect('/')
 
+
 @app.route('/<string:user>/stock/<string:symbol>')
 def stock(user, symbol):
-    if not (username:=session.get('username')) or username != user:
+    if not (username := session.get('username')) or username != user:
         return redirect('/')
-    
+
     recent = stockAPI.getPrice(symbol)
     shares = database.getStock(db, username, symbol)
 
@@ -194,16 +215,17 @@ def stock(user, symbol):
         shares = float(shares[2])
     return make_response(render_template('stock.html', symbol=symbol, recent=recent, user=username, shares=shares), 200)
 
+
 @app.route('/<string:user>/stock/<string:symbol>/charting')
 def chart(user, symbol):
-    if not (username:=session.get('username')) or username != user:
+    if not (username := session.get('username')) or username != user:
         return None
-    
+
     data = stockAPI.getWeekPrice(symbol)
 
     response = make_response(jsonify({'xvals': [i[0] for i in data], 'yvals': [i[1] for i in data]}))
     response.headers['Content-Type'] = 'application/json'
-    
+
     return response
 
 
@@ -212,6 +234,7 @@ def chart(user, symbol):
 @app.errorhandler(404)
 def not_found(parm):
     return make_response(render_template('index.html'), 404)
+
 
 @app.errorhandler(500)
 def broke(parm):
@@ -225,7 +248,7 @@ def broke(parm):
 def admin_page():
     if session.get('username') != 'admin':
         return redirect('/')
-    
+
     # get all users and return a dashboard
         # set up html template
         # designate its own js file
@@ -243,16 +266,17 @@ def admin_page():
 def getPrice(data):
     stock = data['stock']
     method = data['method']
-    
+
     value = stockAPI.getPrice(stock)
 
     emit('priceReturn', {'value': value, 'stock': stock, 'method': method})
 
+
 @socketio.on('buy')
 def buyStock(data):
-    if not (username:=session.get('username')):
+    if not (username := session.get('username')):
         return None
-    
+
     stock = data['stock']
     amount = float(data['amount'])
 
@@ -261,7 +285,7 @@ def buyStock(data):
     balance = float(database.getBalance(db, username))
 
     if amount > balance or amount < 1:
-        return 
+        return
 
     res = stockAPI.buy_stock(stock, amount)
 
@@ -271,7 +295,7 @@ def buyStock(data):
     # db handling
     # check if some is already owned
     # result = db.execute(text('SELECT * FROM purchases WHERE username = :username AND syml = :syml'), {'username': username, 'syml': stock})
-    
+
     result = database.getStock(db, username, stock)
     # if result.rowcount != 0:
     if result:
@@ -285,20 +309,20 @@ def buyStock(data):
     # else add
     else:
         database.addStock(db, username, stock, shares)
-    
+
     database.updateBalance(db, (balance - amount), username)
 
-    emit('returnBuy', {'shares':shares, 'sharePrice':sharePrice})
+    emit('returnBuy', {'shares': shares, 'sharePrice': sharePrice})
 
 
 @socketio.on('sell')
 def sellStock(data):
-    if not (username:=session.get('username')):
+    if not (username := session.get('username')):
         return None
-    
+
     stock = data['stock']
     shares = float(data['shares'])
-    
+
     # check if valid operation
     try:
         stockCount = (list(map(lambda x: x[0], db.execute(text('SELECT shares FROM purchases WHERE username = :username AND syml = :syml'), {'username':username, 'syml': stock}).fetchall()))[0])
@@ -318,7 +342,7 @@ def sellStock(data):
 
     if not remaining:
         # delete from db
-        db.execute(text('DELETE FROM purchases WHERE username = :username AND syml = :syml'), {'username':username, 'syml':stock})
+        db.execute(text('DELETE FROM purchases WHERE username = :username AND syml = :syml'), {'username': username, 'syml':stock})
         db.commit()
     else:
         # update in db
@@ -331,16 +355,18 @@ def sellStock(data):
     db.execute(text('UPDATE balances SET balance = :balance WHERE username = :username'), {'balance': balance, 'username':username})
     db.commit()
 
-    emit('returnSell', {'amount': amount, 'sharePrice':sharePrice})
+    emit('returnSell', {'amount': amount, 'sharePrice': sharePrice})
+
 
 @socketio.on('search')
 def searching(data):
-    if not (username:=session.get('username')):
+    if not (username := session.get('username')):
         return None
     stock = data['symbol']
     price = stockAPI.getPrice(stock)
 
-    return {'price':price, 'user':username}
+    return {'price': price, 'user': username}
+
 
 @socketio.on('delete')
 def deleteUser(data):
@@ -359,5 +385,6 @@ def deleteUser(data):
 @app.route('/test')
 def tester():
     return render_template('test.html')
+
 
 app.run(debug=True, threaded=True, host='0.0.0.0')

@@ -38,7 +38,7 @@ class Database:
     
 
 
-    def login(self, db:scoped_session[Session], email, password) -> Union[str, None]:
+    def login(self, db:scoped_session[Session], email, password): 
         """
         will return a value if user exists, none if else
         """
@@ -57,7 +57,7 @@ class Database:
     
 
 
-    def register(self, db:scoped_session[Session], email, username, password)->Union[bool, str]:
+    def register(self, db:scoped_session[Session], email, username, password):
         """
         will handle user creation is users and balances table
         [success, error]
